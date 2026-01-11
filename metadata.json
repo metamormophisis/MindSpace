@@ -1,5 +1,5 @@
 {
   "name": "MindfulSpace",
-  "description": "MindfulSpace is a mental health companion mobile application which is designed to help people identify, manage, check-in with their emotions on a daily basis, to help them understand themselves better and process their emotions in a much better way. By integrating Google Gemini API for empathetic analysis and Natural Language Processing (NLP) for crisis detection, the app provides a safe, intelligent, and personalized space for users to navigate their emotional journeys.",
+  "description": "A mental health companion app with emotion tracking, journaling, and AI-powered analysis featuring playful blob characters.",
   "requestFramePermissions": []
 }

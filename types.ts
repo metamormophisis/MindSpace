@@ -9,21 +9,21 @@ export enum Emotion {
 }
 
 export const EmotionColors: Record<Emotion, string> = {
-  [Emotion.Sad]: '#6BC5F8',    // Sky Blue
-  [Emotion.Joyful]: '#FF7EB6',     // Hot Pink
-  [Emotion.Confused]: '#2563EB',   // Royal Blue
-  [Emotion.Bored]: '#10B981',      // Green
-  [Emotion.Stressed]: '#22C55E',   // Bright Green
-  [Emotion.Angry]: '#FB5607',      // Orange Red
+  [Emotion.Sad]: '#7B9FE9',      // Periwinkle Blue
+  [Emotion.Joyful]: '#FFD93D',   // Sunny Yellow
+  [Emotion.Confused]: '#B8A9C9', // Soft Purple
+  [Emotion.Bored]: '#95E1D3',    // Minty Green
+  [Emotion.Stressed]: '#FF8F5C', // Coral/Salmon
+  [Emotion.Angry]: '#FF6B6B',    // Soft Red
 };
 
 export const EmotionTextColors: Record<Emotion, string> = {
-    [Emotion.Sad]: '#0C4A6E',
-    [Emotion.Joyful]: '#831843',
-    [Emotion.Confused]: '#1E3A8A',
+    [Emotion.Sad]: '#1E3A8A',
+    [Emotion.Joyful]: '#78350F',
+    [Emotion.Confused]: '#4C1D95',
     [Emotion.Bored]: '#064E3B',
-    [Emotion.Stressed]: '#14532D',
-    [Emotion.Angry]: '#7C2D12',
+    [Emotion.Stressed]: '#7C2D12',
+    [Emotion.Angry]: '#7F1D1D',
 };
 
 export interface UserState {
