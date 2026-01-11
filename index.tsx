@@ -36,7 +36,11 @@ import {
   Lightbulb,
   Move,
   Trophy,
-  Target
+  Target,
+  Play,
+  Pause,
+  RotateCcw,
+  Square
 } from 'lucide-react';
 import { Emotion, EmotionColors, EmotionTextColors, UserState, JournalEntry } from './types';
 
@@ -74,99 +78,114 @@ const getIntensityRange = (intensity: number): 'low' | 'medium' | 'high' => {
 
 // 1. Updated Mound-Style Blob Component
 const Blob = ({ emotion, intensity = 5, className = "w-32 h-32" }: { emotion: Emotion, intensity?: number, className?: string }) => {
-  const getBodyPath = () => {
+  const color = EmotionColors[emotion];
+  const textColor = EmotionTextColors[emotion]; 
+
+  const renderContent = () => {
     switch(emotion) {
-       case Emotion.Joyful:
-          return "M 10,90 L 90,90 L 90,45 Q 90,5 50,5 Q 10,5 10,45 Z"; // Perky, high mound
-       case Emotion.Sad:
-          return "M 5,95 L 95,95 L 95,60 Q 95,30 50,30 Q 5,30 5,60 Z"; // Lower, flatter mound
-       case Emotion.Stressed:
-          return "M 15,90 L 85,90 L 85,45 Q 85,15 50,20 Q 15,15 15,45 Z"; // Tense, slightly squeezed
-       case Emotion.Angry:
-          return "M 10,90 L 90,90 L 90,40 Q 90,20 50,10 Q 10,20 10,40 Z"; // Sharp shoulders
-       default:
-          return "M 10,90 L 90,90 L 90,50 Q 90,10 50,10 Q 10,10 10,50 Z"; // Standard
-    }
-  };
-
-  const getFace = () => {
-    const isHigh = intensity > 7;
-    const color = EmotionTextColors[emotion] || '#333333'; 
-
-    const Blink = (
-       <animate attributeName="ry" values="5;0.5;5" dur="4s" repeatCount="indefinite" begin="1s" />
-    );
-
-    switch(emotion) {
-      case Emotion.Joyful:
-        const smilePath = isHigh ? "M 25,60 Q 50,85 75,60" : "M 30,65 Q 50,75 70,65";
+      case Emotion.Joyful: // Flower Shape
         return (
           <g>
-            <ellipse cx="35" cy="45" rx="5" ry="5" fill={color}>{Blink}</ellipse>
-            <ellipse cx="65" cy="45" rx="5" ry="5" fill={color}>{Blink}</ellipse>
-            <path d={smilePath} stroke={color} strokeWidth="4" fill="none" strokeLinecap="round" />
-            {isHigh && <path d="M 25,60 L 22,65 M 75,60 L 78,65" stroke={color} strokeWidth="3" strokeLinecap="round" opacity="0.5"/>}
+            {/* 4 Petals arranged in a cross/flower shape */}
+            <path d="M 50 25 C 70 5 95 30 75 50 C 95 70 70 95 50 75 C 30 95 5 70 25 50 C 5 30 30 5 50 25 Z" fill={color} />
+            
+            {/* Face: Closed happy eyes (U shape), simple smile */}
+            <g stroke={textColor} strokeWidth="4" fill="none" strokeLinecap="round">
+                {/* Eyes are like arcs opening upwards for a smile/closed eye look */}
+                <path d="M 35 55 Q 35 65 45 55" /> 
+                <path d="M 55 55 Q 55 65 65 55" />
+                <path d="M 40 68 Q 50 75 60 68" />
+            </g>
           </g>
         );
-      case Emotion.Sad:
-        const frownPath = isHigh ? "M 30,75 Q 50,55 70,75" : "M 30,70 Q 50,60 70,70";
+      case Emotion.Stressed: // Triangle Shape
         return (
           <g>
-             <circle cx="35" cy="50" r="4" fill={color} />
-             <circle cx="65" cy="50" r="4" fill={color} />
-             <path d={frownPath} stroke={color} strokeWidth="4" fill="none" strokeLinecap="round" />
-             {isHigh && <path d="M 15,40 Q 25,35 35,40 M 65,40 Q 75,35 85,40" stroke={color} strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.6" />}
+             {/* Rounded Triangle */}
+             <path d="M 50 15 Q 55 15 58 20 L 88 75 Q 91 80 85 80 H 15 Q 9 80 12 75 L 42 20 Q 45 15 50 15 Z" fill={color} />
+             
+             {/* Face: > < eyes, zigzag/straight mouth */}
+             <g stroke={textColor} strokeWidth="4" fill="none" strokeLinecap="round">
+                <path d="M 38 48 L 43 53 L 38 58" /> {/* Left > */}
+                <path d="M 62 48 L 57 53 L 62 58" /> {/* Right < */}
+                <path d="M 45 70 L 50 68 L 55 70" /> {/* Small mouth */}
+             </g>
           </g>
         );
-      case Emotion.Stressed:
+      case Emotion.Angry: // Square Shape
         return (
           <g>
-             <circle cx="35" cy="45" r={isHigh ? 6 : 4} fill={color} />
-             <circle cx="65" cy="45" r={isHigh ? 6 : 4} fill={color} />
-             <path d="M 30,70 Q 40,65 50,70 Q 60,75 70,70" stroke={color} strokeWidth="4" fill="none" strokeLinecap="round" />
-             <path d="M 20,45 L 15,50 M 80,45 L 85,50" stroke={color} strokeWidth="3" strokeLinecap="round" opacity="0.5"/>
+             {/* Rounded Square */}
+             <rect x="20" y="20" width="60" height="60" rx="12" fill={color} />
+             
+             {/* Face: White half-circles, black pupils, straight mouth */}
+             <g transform="translate(0, 5)">
+                 {/* White eyes background */}
+                 <path d="M 30 45 A 10 10 0 1 0 50 45 Z" fill="white" />
+                 <path d="M 55 45 A 10 10 0 1 0 75 45 Z" fill="white" />
+                 {/* Pupils looking side */}
+                 <circle cx="40" cy="48" r="3" fill="black" />
+                 <circle cx="65" cy="48" r="3" fill="black" />
+                 {/* Straight mouth */}
+                 <path d="M 40 65 H 65" stroke={textColor} strokeWidth="4" strokeLinecap="round" />
+             </g>
           </g>
         );
-      case Emotion.Angry:
-        return (
-          <g>
-            <circle cx="35" cy="50" r="4" fill={color} />
-            <circle cx="65" cy="50" r="4" fill={color} />
-            <path d="M 25,40 L 45,45" stroke={color} strokeWidth="4" strokeLinecap="round" />
-            <path d="M 75,40 L 55,45" stroke={color} strokeWidth="4" strokeLinecap="round" />
-            <path d={isHigh ? "M 35,75 Q 50,65 65,75" : "M 35,70 L 65,70"} stroke={color} strokeWidth="4" fill="none" strokeLinecap="round" />
-          </g>
-        );
-      case Emotion.Confused:
+      case Emotion.Bored: // Circle Shape
          return (
             <g>
-               <circle cx="35" cy="45" r="6" fill={color} />
-               <circle cx="65" cy="45" r="4" fill={color} />
-               <path d="M 35,70 Q 50,65 65,75" stroke={color} strokeWidth="4" fill="none" strokeLinecap="round" />
-               <path d="M 70,35 L 80,30" stroke={color} strokeWidth="3" strokeLinecap="round" />
+               <circle cx="50" cy="50" r="38" fill={color} />
+               
+               {/* Face: Large white eyes looking up */}
+               <g transform="translate(0, 5)">
+                  <circle cx="40" cy="45" r="9" fill="white" />
+                  <circle cx="60" cy="45" r="9" fill="white" />
+                  <circle cx="40" cy="42" r="3.5" fill="black" />
+                  <circle cx="60" cy="42" r="3.5" fill="black" />
+                  <path d="M 46 65 H 54" stroke={textColor} strokeWidth="3" strokeLinecap="round" />
+               </g>
             </g>
          );
-       case Emotion.Bored:
-          return (
-             <g>
-                <path d="M 30,45 L 40,45" stroke={color} strokeWidth="4" strokeLinecap="round" />
-                <path d="M 60,45 L 70,45" stroke={color} strokeWidth="4" strokeLinecap="round" />
-                <path d="M 35,70 L 65,70" stroke={color} strokeWidth="4" strokeLinecap="round" />
-             </g>
-          );
+      case Emotion.Sad: // Wavy Stack Shape
+         return (
+            <g>
+               {/* Stacked wavy shape */}
+               <path d="M 25 25 H 75 Q 85 37 75 50 Q 85 62 75 75 H 25 Q 15 62 25 50 Q 15 37 25 25 Z" fill={color} />
+               
+               {/* Face: Closed down-turned eyes, flat mouth */}
+               <g stroke={textColor} strokeWidth="4" fill="none" strokeLinecap="round" transform="translate(0, 5)">
+                  <path d="M 35 50 Q 40 55 45 50" />
+                  <path d="M 55 50 Q 60 55 65 50" />
+                  <path d="M 45 65 H 55" />
+               </g>
+            </g>
+         );
+      case Emotion.Confused: // Hexagon Shape
+         return (
+            <g>
+               {/* Rounded Hexagon */}
+               <path d="M 28 20 L 72 20 L 92 50 L 72 80 L 28 80 L 8 50 Z" fill={color} stroke={color} strokeWidth="8" strokeLinejoin="round" />
+               
+               {/* Face: One big eye, one swirl eye */}
+               <g transform="translate(0, 0)">
+                  {/* Left Eye: Normal */}
+                  <circle cx="38" cy="48" r="10" fill="white" />
+                  <circle cx="40" cy="48" r="3" fill="black" />
+                  
+                  {/* Right Eye: Spiral */}
+                  <circle cx="68" cy="48" r="10" fill="white" />
+                  <path d="M 68 48 m -6 0 a 6 6 0 1 0 12 0 a 6 6 0 1 0 -12 0 M 68 48 m -3 0 a 3 3 0 1 0 6 0 a 3 3 0 1 0 -6 0" stroke="#F97316" strokeWidth="2" fill="none" opacity="0.8" />
+               </g>
+            </g>
+         );
       default: return null;
     }
   };
 
   return (
     <div className={`${className} transition-transform duration-500 ease-in-out`}>
-      <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible drop-shadow-xl">
-         <path 
-           d={getBodyPath()} 
-           fill={EmotionColors[emotion] || '#CCCCCC'} 
-           className="transition-all duration-700 ease-in-out"
-         />
-         {getFace()}
+      <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible drop-shadow-md">
+         {renderContent()}
       </svg>
     </div>
   );
@@ -662,7 +681,7 @@ Make it supportive, concise, and warm. No medical advice.`;
 
   // Step 6: Post-Journaling Activity
   if (step === 6) {
-    const handleActivityFinish = () => setStep(7);
+    const handleActivityFinish = () => onComplete();
 
     // Unique Activity for EACH emotion
     switch(emotion) {
@@ -683,44 +702,7 @@ Make it supportive, concise, and warm. No medical advice.`;
     }
   }
 
-  // Step 7: Completion Screen
-  if (step === 7) {
-      // Use ref to keep quote stable across re-renders of this step
-      const quoteRef = useRef(QUOTES[Math.floor(Math.random() * QUOTES.length)]);
-      
-      // Animation state
-      const [show, setShow] = useState(false);
-      
-      useEffect(() => {
-          const timer = setTimeout(() => setShow(true), 100);
-          return () => clearTimeout(timer);
-      }, []);
-
-      return (
-          <div className="h-full flex flex-col items-center justify-center p-8 transition-colors duration-500 relative overflow-hidden" style={{ backgroundColor: bgColor }}>
-               {/* Decorative background blobs */}
-              <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-              <div className="absolute bottom-[-10%] right-[-10%] w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-
-              <div className={`transition-all duration-700 ease-out transform ${show ? 'scale-100 opacity-100' : 'scale-50 opacity-0'}`}>
-                  <div className="bg-white p-6 rounded-full shadow-2xl mb-8">
-                     <Check size={48} className="text-[#333333]" strokeWidth={4} />
-                  </div>
-              </div>
-
-              <h2 className={`text-4xl font-bold font-display text-white mb-2 transition-all duration-700 delay-200 ${show ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>Well done.</h2>
-              <p className={`text-white/80 text-lg font-medium mb-12 transition-all duration-700 delay-300 ${show ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>You've taken a great step for yourself.</p>
-
-              <div className={`w-full max-w-sm bg-white/20 backdrop-blur-md border border-white/30 p-8 rounded-[32px] text-center mb-16 transition-all duration-700 delay-500 ${show ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-                 <p className="text-white font-display text-xl font-medium italic leading-relaxed">"{quoteRef.current}"</p>
-              </div>
-
-              <div className={`w-full transition-all duration-700 delay-700 ${show ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-                 <Button onClick={onComplete} className="w-full bg-white text-[#333333] hover:bg-white/90 shadow-xl h-16 text-lg">Return Home</Button>
-              </div>
-          </div>
-      )
-  }
+  // Step 7 Removed as per user request
   return null;
 };
 
@@ -849,31 +831,148 @@ const DashboardView = () => {
   );
 };
 
-const CalmView = () => (
-  <div className="h-full p-8 bg-[#E0F7FA] overflow-y-auto">
-    <h2 className="text-3xl font-display font-bold text-[#006064] mb-6">Breathe & Relax</h2>
-    <div className="space-y-4">
-       <Card onClick={() => {}} className="cursor-pointer hover:shadow-md transition-shadow !bg-white/80 backdrop-blur-sm border-none">
-          <div className="flex items-center gap-4">
-            <div className="bg-cyan-100 p-3 rounded-full text-cyan-600"><Wind size={24} /></div>
-            <div>
-                <h3 className="font-bold text-lg text-cyan-900">4-7-8 Breathing</h3>
-                <p className="text-cyan-700/70 text-sm">Relax your nervous system.</p>
-            </div>
-          </div>
-       </Card>
-       <Card onClick={() => {}} className="cursor-pointer hover:shadow-md transition-shadow !bg-white/80 backdrop-blur-sm border-none">
-          <div className="flex items-center gap-4">
-             <div className="bg-teal-100 p-3 rounded-full text-teal-600"><Move size={24} /></div>
-             <div>
-                <h3 className="font-bold text-lg text-teal-900">Box Breathing</h3>
-                <p className="text-teal-700/70 text-sm">Focus and calm your mind.</p>
+const CalmView = () => {
+  const [duration, setDuration] = useState(5);
+  const [timeLeft, setTimeLeft] = useState(5 * 60);
+  const [isActive, setIsActive] = useState(false);
+  const [cycles, setCycles] = useState(0);
+  const [phase, setPhase] = useState<'Inhale' | 'Hold' | 'Exhale' | 'Rest'>('Inhale');
+  
+  // Ref to track cycle progress for animation sync independent of re-renders
+  const cycleTimeRef = useRef(0);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isActive && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft(prev => prev - 1);
+        
+        // Update cycle logic
+        cycleTimeRef.current = (cycleTimeRef.current + 1) % 16;
+        const t = cycleTimeRef.current;
+        
+        if (t >= 0 && t < 4) setPhase('Inhale');
+        else if (t >= 4 && t < 8) setPhase('Hold');
+        else if (t >= 8 && t < 12) setPhase('Exhale');
+        else setPhase('Rest');
+
+        if (t === 0 && cycleTimeRef.current !== 0) { // Cycle complete
+           setCycles(c => c + 1);
+        }
+      }, 1000);
+    } else if (timeLeft === 0) {
+       setIsActive(false);
+    }
+    return () => clearInterval(interval);
+  }, [isActive, timeLeft]);
+
+  const handleDurationChange = (min: number) => {
+     setDuration(min);
+     setTimeLeft(min * 60);
+     setIsActive(false);
+     setCycles(0);
+     cycleTimeRef.current = 0;
+     setPhase('Inhale');
+  };
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+
+  const getInstruction = () => {
+     switch(phase) {
+        case 'Inhale': return "Breathe in...";
+        case 'Hold': return "Hold...";
+        case 'Exhale': return "Breathe out...";
+        case 'Rest': return "Rest...";
+     }
+  };
+
+  const getScaleClass = () => {
+     switch(phase) {
+        case 'Inhale': return "scale-125"; // Expanding
+        case 'Hold': return "scale-125";   // Expanded
+        case 'Exhale': return "scale-100"; // Contracting
+        case 'Rest': return "scale-100";   // Contracted
+     }
+  };
+
+  return (
+    <div className="h-full flex flex-col bg-purple-50 relative overflow-hidden">
+       {/* Background Gradients */}
+       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+          <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-200/40 rounded-full blur-[100px] animate-pulse-slow"></div>
+          <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-200/40 rounded-full blur-[100px] animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+       </div>
+
+       {/* Header */}
+       <div className="p-8 z-10 text-center">
+          <h2 className="text-3xl font-display font-bold text-slate-700">Calm Space</h2>
+       </div>
+
+       {/* Duration Selector */}
+       <div className="flex justify-center gap-4 z-10 mb-8">
+          {[5, 10].map(min => (
+             <button 
+               key={min}
+               onClick={() => handleDurationChange(min)}
+               className={`px-6 py-2 rounded-full font-bold transition-all ${duration === min ? 'bg-white text-purple-600 shadow-md transform scale-105' : 'bg-white/50 text-slate-500 hover:bg-white/80'}`}
+             >
+               {min} min
+             </button>
+          ))}
+       </div>
+
+       {/* Main Animation Area */}
+       <div className="flex-1 flex flex-col items-center justify-center relative z-10">
+          <div className="relative w-72 h-72 flex items-center justify-center">
+             {/* Outer Glow */}
+             <div className={`absolute inset-0 bg-white/30 rounded-full blur-2xl transition-all duration-[4000ms] ${getScaleClass()}`}></div>
+             
+             {/* Breathing Circle */}
+             <div className={`w-48 h-48 rounded-full bg-gradient-to-br from-purple-300 to-blue-300 shadow-xl flex items-center justify-center transition-all duration-[4000ms] ease-in-out ${getScaleClass()}`}>
+                <div className="w-40 h-40 rounded-full bg-white/10 backdrop-blur-sm"></div>
+             </div>
+             
+             {/* Text Overlay */}
+             <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-2xl font-bold text-slate-700 drop-shadow-sm transition-all duration-500">{isActive ? getInstruction() : "Ready?"}</span>
+                {isActive && <span className="text-sm font-bold text-slate-500 mt-2">{formatTime(timeLeft)}</span>}
              </div>
           </div>
-       </Card>
+          
+          <div className="mt-12 font-bold text-slate-400 uppercase tracking-widest text-sm">
+             Cycle {cycles} / {Math.floor((duration * 60) / 16)} complete
+          </div>
+       </div>
+
+       {/* Controls */}
+       <div className="p-8 z-10 mb-16">
+          <div className="flex items-center justify-center gap-8">
+             {/* Finish/Back Button */}
+             <button onClick={() => setIsActive(false)} className="p-4 bg-white text-slate-400 rounded-full shadow-sm hover:bg-slate-50 transition-colors">
+                <Square size={24} fill="currentColor" className="opacity-50" />
+             </button>
+
+             {/* Play/Pause */}
+             <button 
+               onClick={() => setIsActive(!isActive)}
+               className="w-20 h-20 bg-slate-800 text-white rounded-full shadow-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
+             >
+                {isActive ? <Pause size={32} fill="currentColor" /> : <Play size={32} fill="currentColor" className="ml-1" />}
+             </button>
+
+             {/* Reset */}
+             <button onClick={() => handleDurationChange(duration)} className="p-4 bg-white text-slate-400 rounded-full shadow-sm hover:bg-slate-50 transition-colors">
+                <RotateCcw size={24} />
+             </button>
+          </div>
+       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const ProfileView = ({ user, onLogout }: { user: UserState, onLogout: () => void }) => (
   <div className="h-full p-8 flex flex-col items-center bg-[#FAF9F6]">
@@ -1028,7 +1127,7 @@ const GroundingExercise = ({ onFinish }: { onFinish: () => void }) => {
 
             <div className="space-y-3 flex-1 overflow-y-auto pr-2">
                 {inputs.map((val, i) => (
-                    <div key={i} className="animate-in slide-in-from-bottom-2 fade-in duration-500" style={{ animationDelay: `${i * 100}ms` }}>
+                    <div key={i}>
                         <input 
                             value={val}
                             onChange={(e) => updateInput(i, e.target.value)}
